@@ -1,21 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import { createStackNavigator } from "react-navigation-stack";
+import { createAppContainer } from "react-navigation";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+// import the screens we want to navigate between
+import Start from "./components/Start";
+import Chat from "./components/Chat";
+
+const navigator = createStackNavigator({
+  Start: { screen: Start },
+  Chat: { screen: Chat },
 });
+
+const navigatorContainer = createAppContainer(navigator);
+//export as root
+export default navigatorContainer;
