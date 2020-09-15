@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, TextInput, Button, ImageBackground, TouchableHighlight, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  KeyboardAvoidingView,
+  ImageBackground,
+  TouchableHighlight,
+  TouchableOpacity,
+} from "react-native";
 
 // Opening screen (Start)
 export default class Start extends Component {
@@ -61,6 +70,7 @@ export default class Start extends Component {
             </TouchableHighlight>
           </View>
         </ImageBackground>
+        {Platform.OS === "android" ? <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-550} /> : null}
       </View>
     );
   }
@@ -85,14 +95,16 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   infoHolder: {
-    flex: 1,
+    // flex: 1,
+    opacity: 0.9,
     width: "88%",
     height: "44%",
     backgroundColor: "#fff",
     marginBottom: 90,
     borderRadius: 3,
-    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
   },
   input: {
     fontSize: 18,
