@@ -32,6 +32,8 @@ export default class Chat extends React.Component {
             avatar: "https://placeimg.com/140/140/any",
           },
         },
+
+        // System message to inform user they have successfully entered chat
         {
           _id: 2,
           // Template literal to add user name from state
@@ -66,7 +68,6 @@ export default class Chat extends React.Component {
 
   render() {
     return (
-      // <View style={{ flex: 1, justifyContent: "center", backgroundColor: this.props.navigation.state.params.color }}>
       <View style={[styles.container, { backgroundColor: this.props.navigation.state.params.color }]}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
