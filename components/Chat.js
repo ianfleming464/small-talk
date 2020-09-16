@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet, View, Platform, KeyboardAvoidingView, Navigator } from "react-native";
-import { GiftedChat } from "react-native-gifted-chat";
+import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 export default class Chat extends React.Component {
   constructor() {
@@ -20,7 +20,7 @@ export default class Chat extends React.Component {
 
   componentDidMount() {
     this.setState({
-      // hard-coded message for testing purposes
+      // hard-coded messages for testing purposes
       messages: [
         {
           _id: 1,
@@ -34,7 +34,8 @@ export default class Chat extends React.Component {
         },
         {
           _id: 2,
-          text: "Gemma enetered the chat",
+          // Template literal to add user name from state
+          text: `${this.props.navigation.state.params.name} has entered the chat`,
           createdAt: new Date(),
           system: true,
         },
@@ -49,10 +50,26 @@ export default class Chat extends React.Component {
     }));
   }
 
+  // function to change color of user speech bubble
+  renderBubble(props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: "#292929",
+          },
+        }}
+      />
+    );
+  }
+
   render() {
     return (
-      <View style={{ flex: 1, justifyContent: "center", backgroundColor: this.props.navigation.state.params.color }}>
+      // <View style={{ flex: 1, justifyContent: "center", backgroundColor: this.props.navigation.state.params.color }}>
+      <View style={[styles.container, { backgroundColor: this.props.navigation.state.params.color }]}>
         <GiftedChat
+          renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={{
@@ -64,12 +81,11 @@ export default class Chat extends React.Component {
     );
   }
 }
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     // default color if none selected on start screen, overridden by above code color selected.
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-// });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // default color if none selected on start screen, overridden by above code color selected.
+    backgroundColor: "#fff",
+    justifyContent: "center",
+  },
+});
