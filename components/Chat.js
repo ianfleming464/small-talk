@@ -82,6 +82,8 @@ export default class Chat extends React.Component {
     );
   }
 }
+
+// Style sheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
