@@ -96,7 +96,6 @@ export default class Chat extends React.Component {
   get user() {
     return {
       name: this.props.navigation.state.params.name,
-      avatar: "https://placeimg.com/140/140/any",
       _id: this.state.uid,
       id: this.state.uid,
     };
