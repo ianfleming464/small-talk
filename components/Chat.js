@@ -14,24 +14,32 @@ export default class Chat extends React.Component {
       messages: [],
       uid: 0,
       loggedInText: "Please wait.. Logging in..",
-      user: {},
     };
 
-    // firebase configuration info
-    const firebaseConfig = {
-      apiKey: "AIzaSyBEecY0UoANWySp5FwDMTxrP_Qun8HwN2I",
-      authDomain: "small-talk-7344b.firebaseapp.com",
-      databaseURL: "https://small-talk-7344b.firebaseio.com",
-      projectId: "small-talk-7344b",
-      storageBucket: "small-talk-7344b.appspot.com",
-      messagingSenderId: "240094343140",
-      appId: "1:240094343140:web:f2c6c55c531ef7657e61f1",
-      measurementId: "G-2FXLH8647Q",
-    };
+    // // firebase configuration info
+    // const firebaseConfig = {
+    //   apiKey: "AIzaSyBEecY0UoANWySp5FwDMTxrP_Qun8HwN2I",
+    //   authDomain: "small-talk-7344b.firebaseapp.com",
+    //   databaseURL: "https://small-talk-7344b.firebaseio.com",
+    //   projectId: "small-talk-7344b",
+    //   storageBucket: "small-talk-7344b.appspot.com",
+    //   messagingSenderId: "240094343140",
+    //   appId: "1:240094343140:web:f2c6c55c531ef7657e61f1",
+    //   measurementId: "G-2FXLH8647Q",
+    // };
 
     // initialize firebase
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp({
+        apiKey: "AIzaSyBEecY0UoANWySp5FwDMTxrP_Qun8HwN2I",
+        authDomain: "small-talk-7344b.firebaseapp.com",
+        databaseURL: "https://small-talk-7344b.firebaseio.com",
+        projectId: "small-talk-7344b",
+        storageBucket: "small-talk-7344b.appspot.com",
+        messagingSenderId: "240094343140",
+        appId: "1:240094343140:web:f2c6c55c531ef7657e61f1",
+        measurementId: "G-2FXLH8647Q",
+      });
     }
 
     // creating a reference to messages collection
@@ -40,10 +48,11 @@ export default class Chat extends React.Component {
 
     // ...end of constructor
   }
-
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
+    // go through each document
     querySnapshot.forEach((doc) => {
+      // get the data
       var data = doc.data();
       messages.push({
         _id: data._id,
@@ -51,9 +60,11 @@ export default class Chat extends React.Component {
         createdAt: data.createdAt.toDate(),
         user: data.user,
       });
-      this.setState({
-        messages,
-      });
+      // this.setState({
+      //   messages,
+    });
+    this.setState({
+      messages,
     });
   };
 
@@ -62,9 +73,10 @@ export default class Chat extends React.Component {
     const message = this.state.messages[0];
     this.referenceMessages.add({
       _id: message._id,
-      text: message.text,
+      text: message.text || "",
       createdAt: message.createdAt,
       user: message.user,
+      uid: this.state.uid,
     });
   }
 
@@ -83,9 +95,10 @@ export default class Chat extends React.Component {
   // function to retrieve user info (GiftedChat user object - see docs)
   get user() {
     return {
-      _id: this.state.uid,
       name: this.props.navigation.state.params.name,
       avatar: "https://placeimg.com/140/140/any",
+      _id: this.state.uid,
+      id: this.state.uid,
     };
   }
 
@@ -103,8 +116,10 @@ export default class Chat extends React.Component {
         uid: user.uid,
         loggedInText: "Wilkommen!",
       });
+
       // create a reference to the active user's documents (messages)
-      this.referenceMessageUser = firebase.firestore().collection("messages").where("uid", "==", this.state.uid);
+      this.referenceMessageUser = firebase.firestore().collection("messages");
+      // .where("uid", "==", this.state.uid);
       // ----DOESN'T SEEM TO WORK...I think
 
       // listen for collection changes for current user, order so newest at bottom
