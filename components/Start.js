@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -8,12 +8,13 @@ import {
   ImageBackground,
   TouchableHighlight,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 
 // Opening screen (Start)
-export default class Start extends Component {
-  constructor() {
-    super();
+export default class Start extends React.Component {
+  constructor(props) {
+    super(props);
     // initialise state with name, color
     this.state = { name: "", color: "" };
   }
@@ -70,7 +71,7 @@ export default class Start extends Component {
             </TouchableHighlight>
           </View>
         </ImageBackground>
-        {Platform.OS === "android" ? <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-550} /> : null}
+        {Platform.OS === "android" ? <KeyboardAvoidingView behavior="height" /> : null}
       </View>
     );
   }
