@@ -14,19 +14,13 @@ export default class Chat extends React.Component {
       messages: [],
       uid: 0,
       loggedInText: "Please wait.. Logging in..",
+      // initialising a user object in the state
+      user: {
+        _id: "",
+        name: "",
+        avatar: "",
+      },
     };
-
-    // // firebase configuration info
-    // const firebaseConfig = {
-    //   apiKey: "AIzaSyBEecY0UoANWySp5FwDMTxrP_Qun8HwN2I",
-    //   authDomain: "small-talk-7344b.firebaseapp.com",
-    //   databaseURL: "https://small-talk-7344b.firebaseio.com",
-    //   projectId: "small-talk-7344b",
-    //   storageBucket: "small-talk-7344b.appspot.com",
-    //   messagingSenderId: "240094343140",
-    //   appId: "1:240094343140:web:f2c6c55c531ef7657e61f1",
-    //   measurementId: "G-2FXLH8647Q",
-    // };
 
     // initialize firebase
     if (!firebase.apps.length) {
@@ -60,8 +54,6 @@ export default class Chat extends React.Component {
         createdAt: data.createdAt.toDate(),
         user: data.user,
       });
-      // this.setState({
-      //   messages,
     });
     this.setState({
       messages,
@@ -70,6 +62,9 @@ export default class Chat extends React.Component {
 
   // add messages to firestore
   addMessages() {
+    // logging the user object for debugging purposes
+    console.log(this.state.user);
+
     const message = this.state.messages[0];
     this.referenceMessages.add({
       _id: message._id,
@@ -92,15 +87,6 @@ export default class Chat extends React.Component {
     );
   }
 
-  // function to retrieve user info (GiftedChat user object - see docs)
-  get user() {
-    return {
-      name: this.props.navigation.state.params.name,
-      _id: this.state.uid,
-      id: this.state.uid,
-    };
-  }
-
   // LIFE CYCLE METHODS
 
   componentDidMount() {
@@ -113,17 +99,25 @@ export default class Chat extends React.Component {
       //update user state with currently active user data
       this.setState({
         uid: user.uid,
+        user: {
+          _id: user.uid,
+          name: this.props.navigation.state.params.name,
+          avatar: "",
+        },
         loggedInText: "Wilkommen!",
       });
 
       // create a reference to the active user's documents (messages)
       this.referenceMessageUser = firebase.firestore().collection("messages");
+
       // .where("uid", "==", this.state.uid);
-      // ----DOESN'T SEEM TO WORK...I think
+      // ----DOESN'T SEEM TO WORK...I think. This breaks the ability to have 2 users and removes avatar----
 
       // listen for collection changes for current user, order so newest at bottom
       this.unsubscribeMessageUser = this.referenceMessageUser.orderBy("createdAt", "desc").onSnapshot(this.onCollectionUpdate);
     });
+
+    // System message, appears while async is fetching messages.
     this.setState({
       messages: [
         {
