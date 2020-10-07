@@ -1,6 +1,9 @@
 import React from "react";
-import { StyleSheet, View, Text, Platform, KeyboardAvoidingView } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { StyleSheet, View, Text, Platform, KeyboardAvoidingView, YellowBox } from "react-native";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
+import AsyncStorage from "@react-native-community/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import KeyboardSpaceView from "react-native-keyboard-spacer-view";
 
 // import firebase
 const firebase = require("firebase");
@@ -20,7 +23,11 @@ export default class Chat extends React.Component {
         name: "",
         avatar: "",
       },
+      isConnected: false,
     };
+
+    // workaround to ignore the incessant "setting a timer.." React Native bug
+    YellowBox.ignoreWarnings(["Setting a timer"]);
 
     // initialize firebase
     if (!firebase.apps.length) {
@@ -70,7 +77,7 @@ export default class Chat extends React.Component {
       _id: message._id,
       text: message.text || "",
       createdAt: message.createdAt,
-      user: message.user,
+      user: message.user, //??
       uid: this.state.uid,
     });
   }
@@ -83,50 +90,114 @@ export default class Chat extends React.Component {
       }),
       () => {
         this.addMessages();
+        this.saveMessages();
       }
     );
+  }
+
+  // async functions for offline functionality
+  getMessages = async () => {
+    let messages = "";
+    try {
+      messages = (await AsyncStorage.getItem("messages")) || [];
+      this.setState({
+        messages: JSON.parse(messages),
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  saveMessages = async () => {
+    try {
+      await AsyncStorage.setItem("messages", JSON.stringify(this.state.messages));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  deleteMessages = async () => {
+    try {
+      await AsyncStorage.removeItem("messages");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  // Hides input bar when offline, as messages cannot be sent
+  renderInputToolbar(props) {
+    console.log("Message from renderInputToolbar: " + this.state.isConnected);
+    if (this.state.isConnected == false) {
+    } else {
+      return <InputToolbar {...props} />;
+    }
   }
 
   // LIFE CYCLE METHODS
 
   componentDidMount() {
-    // listen to authentication events
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
-
-      //update user state with currently active user data
-      this.setState({
-        uid: user.uid,
-        user: {
-          _id: user.uid,
-          name: this.props.navigation.state.params.name,
-          avatar: "",
-        },
-        loggedInText: "Wilkommen!",
-      });
-
-      // create a reference to the active user's documents (messages)
-      this.referenceMessageUser = firebase.firestore().collection("messages");
-
-      // .where("uid", "==", this.state.uid);
-      // ----DOESN'T SEEM TO WORK...I think. This breaks the ability to have 2 users and removes avatar----
-
-      // listen for collection changes for current user, order so newest at bottom
-      this.unsubscribeMessageUser = this.referenceMessageUser.orderBy("createdAt", "desc").onSnapshot(this.onCollectionUpdate);
+    this.getMessages();
+    // check connection status and log info (from NetInfo docs)
+    NetInfo.fetch().then((state) => {
+      console.log("Connection type : ", state.type);
+      console.log("Connected? : ", state.isConnected);
     });
 
-    // System message, appears while async is fetching messages.
-    this.setState({
-      messages: [
-        {
-          _id: 2,
-          text: this.props.navigation.state.params.name + " entered the chat",
-          createdAt: new Date(),
-          system: true,
-        },
-      ],
+    // subscribe to network state updates (also from NetInfo docs)
+    // NetInfo.addEventListener((state) => {
+    //   const isConnected = state.isConnected;
+    //   if (isConnected == true) {
+    //     this.setState({
+    //       isConnected: true,
+    //     });
+    //   } else {
+    //     this.setState({
+    //       isConnected: false,
+    //     });
+    //   }
+    // });
+
+    NetInfo.fetch().then((state) => {
+      const isConnected = state.isConnected;
+      if (isConnected == true) {
+        this.setState({
+          isConnected: true,
+        });
+        // listen to authentication events
+        this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+          if (!user) {
+            await firebase.auth().signInAnonymously();
+          }
+
+          //update user state with currently active user data
+          this.setState({
+            uid: user.uid,
+            user: {
+              _id: user.uid,
+              name: this.props.navigation.state.params.name,
+              avatar: "",
+            },
+            loggedInText: "Wilkommen!",
+            isConnected: true,
+          });
+          // create a reference to the active user's documents (messages)
+          this.referenceMessageUser = firebase.firestore().collection("messages");
+
+          // .where("uid", "==", this.state.uid);
+          // ----DOESN'T SEEM TO WORK...I think. This breaks the ability to have 2 users and removes avatar----
+
+          // listen for collection changes for current user, order so newest at bottom
+          this.unsubscribeMessageUser = this.referenceMessageUser
+            .orderBy("createdAt", "desc")
+            .onSnapshot(this.onCollectionUpdate);
+        });
+      } else {
+        console.log("offline");
+        this.setState({
+          isConnected: false,
+        });
+        this.getMessages();
+      }
     });
   }
 
