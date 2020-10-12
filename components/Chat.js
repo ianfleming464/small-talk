@@ -1,9 +1,8 @@
-import React from "react";
-import { StyleSheet, View, Text, Platform, KeyboardAvoidingView, YellowBox } from "react-native";
+import React, { Component } from "react";
+import { StyleSheet, View, Text, Platform, KeyboardAvoidingView } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import AsyncStorage from "@react-native-community/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import KeyboardSpaceView from "react-native-keyboard-spacer-view";
 
 // import firebase
 const firebase = require("firebase");
@@ -25,9 +24,6 @@ export default class Chat extends React.Component {
       },
       isConnected: false,
     };
-
-    // workaround to ignore the incessant "setting a timer.." React Native bug
-    YellowBox.ignoreWarnings(["Setting a timer"]);
 
     // initialize firebase
     if (!firebase.apps.length) {
@@ -77,7 +73,7 @@ export default class Chat extends React.Component {
       _id: message._id,
       text: message.text || "",
       createdAt: message.createdAt,
-      user: message.user, //??
+      user: message.user,
       uid: this.state.uid,
     });
   }
@@ -95,78 +91,27 @@ export default class Chat extends React.Component {
     );
   }
 
-  // async functions for offline functionality
-  getMessages = async () => {
-    let messages = "";
-    try {
-      messages = (await AsyncStorage.getItem("messages")) || [];
-      this.setState({
-        messages: JSON.parse(messages),
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  saveMessages = async () => {
-    try {
-      await AsyncStorage.setItem("messages", JSON.stringify(this.state.messages));
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  deleteMessages = async () => {
-    try {
-      await AsyncStorage.removeItem("messages");
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  // Hides input bar when offline, as messages cannot be sent
-  renderInputToolbar(props) {
-    console.log("Message from renderInputToolbar: " + this.state.isConnected);
-    if (this.state.isConnected == false) {
-    } else {
-      return <InputToolbar {...props} />;
-    }
-  }
-
   // LIFE CYCLE METHODS
 
   componentDidMount() {
-    this.getMessages();
+    // this.getMessages();
     // check connection status and log info (from NetInfo docs)
     NetInfo.fetch().then((state) => {
       console.log("Connection type : ", state.type);
       console.log("Connected? : ", state.isConnected);
     });
 
-    // subscribe to network state updates (also from NetInfo docs)
-    // NetInfo.addEventListener((state) => {
-    //   const isConnected = state.isConnected;
-    //   if (isConnected == true) {
-    //     this.setState({
-    //       isConnected: true,
-    //     });
-    //   } else {
-    //     this.setState({
-    //       isConnected: false,
-    //     });
-    //   }
-    // });
-
     NetInfo.fetch().then((state) => {
-      const isConnected = state.isConnected;
-      if (isConnected == true) {
-        this.setState({
-          isConnected: true,
-        });
-        // listen to authentication events
+      if (state.isConnected) {
+        this.setState({ isConnected: true });
+        // listen to authentication events - added try / catch block and template literal..because why not.
         this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
           if (!user) {
-            await firebase.auth().signInAnonymously();
+            try {
+              await firebase.auth().signInAnonymously();
+            } catch (error) {
+              console.log(`Unable to sign in: ${error.message}`);
+            }
           }
 
           //update user state with currently active user data
@@ -178,7 +123,6 @@ export default class Chat extends React.Component {
               avatar: "",
             },
             loggedInText: "Wilkommen!",
-            isConnected: true,
           });
           // create a reference to the active user's documents (messages)
           this.referenceMessageUser = firebase.firestore().collection("messages");
@@ -195,6 +139,7 @@ export default class Chat extends React.Component {
         console.log("offline");
         this.setState({
           isConnected: false,
+          loggedInText: "Offline mode enabled",
         });
         this.getMessages();
       }
@@ -202,10 +147,11 @@ export default class Chat extends React.Component {
   }
 
   componentWillUnmount() {
+    // using the && operator to eliminate 'not a function' error
     // stop listening to authentication
-    this.authUnsubscribe();
+    this.authUnsubscribe && this.authUnsubscribe();
     // stop listening for changes
-    this.unsubscribeMessageUser();
+    this.unsubscribeMessageUser && this.unsubscribeMessageUser();
   }
 
   // add user's name to navbar
@@ -229,13 +175,54 @@ export default class Chat extends React.Component {
     );
   }
 
+  // Asynchronous functions :
+  //Loads messages from AsyncStorage
+  getMessages = async () => {
+    let messages = "";
+    try {
+      messages = (await AsyncStorage.getItem("messages")) || [];
+      this.setState({
+        messages: JSON.parse(messages),
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //Saves messages to AsyncStorage
+  saveMessages = async () => {
+    try {
+      await AsyncStorage.setItem("messages", JSON.stringify(this.state.messages));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //Deletes messages from AsyncStorage - for development purposes
+  // deleteMessages = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem("messages");
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
+  //Render input toolbar only when online
+  renderInputToolbar(props) {
+    if (this.state.isConnected === false) {
+    } else {
+      return <InputToolbar {...props} />;
+    }
+  }
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: this.props.navigation.state.params.color }}>
         <Text style={styles.userHi}>{this.state.loggedInText}</Text>
 
         <GiftedChat
-          renderBubble={this.renderBubble.bind(this)}
+          renderBubble={this.renderBubble}
+          renderInputToolbar={this.renderInputToolbar.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={this.state.user}

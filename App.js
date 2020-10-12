@@ -1,8 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-
+import { StyleSheet, Text, View, LogBox } from "react-native";
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
+
+LogBox.ignoreAllLogs(true);
 
 // import the screens we want to navigate between
 import Start from "./components/Start";
