@@ -12,6 +12,13 @@ import * as Location from "expo-location";
 const firebase = require("firebase");
 require("firebase/firestore");
 
+// ES6 Checklist:
+// Template literals? N/A
+// no var? Y
+// Arrow functions? Y
+// Default function parameters? N/A
+// ALL async functions with try/catch blocks? Y
+
 export default class CustomActions extends React.Component {
   constructor() {
     super();
@@ -26,6 +33,7 @@ export default class CustomActions extends React.Component {
         options,
         cancelButtonIndex,
       },
+      // try/catch block seems unneccesary here?!
       async (buttonIndex) => {
         switch (buttonIndex) {
           case 0:
@@ -46,54 +54,64 @@ export default class CustomActions extends React.Component {
   // function to select image from user's gallery
   pickImage = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    try {
+      if (status === "granted") {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        }).catch((error) => console.log(error));
 
-    if (status === "granted") {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      }).catch((error) => console.log(error));
-
-      if (!result.cancelled) {
-        const imageUrl = await this.uploadImage(result.uri);
-        this.props.onSend({ image: imageUrl });
+        if (!result.cancelled) {
+          const imageUrl = await this.uploadImage(result.uri);
+          this.props.onSend({ image: imageUrl });
+        }
       }
+    } catch (error) {
+      console.log(error.message);
     }
   };
 
   // function to take photo
   takePhoto = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL, Permissions.CAMERA);
-    if (status === "granted") {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      }).catch((error) => console.log(error));
-      if (!result.cancelled) {
-        const imageUrl = await this.uploadImage(result.uri);
-        this.props.onSend({ image: imageUrl });
+    try {
+      if (status === "granted") {
+        let result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        }).catch((error) => console.log(error));
+        if (!result.cancelled) {
+          const imageUrl = await this.uploadImage(result.uri);
+          this.props.onSend({ image: imageUrl });
+        }
       }
+    } catch {
+      console.log(error.message);
     }
   };
 
   // function to get user's location
   getLocation = async () => {
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
-
-    if (status === "granted") {
-      let result = await Location.getCurrentPositionAsync({}).catch((error) => console.log(error));
-      const longitude = JSON.stringify(result.coords.longitude);
-      const latitude = JSON.stringify(result.coords.latitude);
-      if (result) {
-        this.props.onSend({
-          location: {
-            longitude: result.coords.longitude,
-            latitude: result.coords.latitude,
-          },
-        });
+    try {
+      if (status === "granted") {
+        let result = await Location.getCurrentPositionAsync({}).catch((error) => console.log(error));
+        const longitude = JSON.stringify(result.coords.longitude);
+        const latitude = JSON.stringify(result.coords.latitude);
+        if (result) {
+          this.props.onSend({
+            location: {
+              longitude: result.coords.longitude,
+              latitude: result.coords.latitude,
+            },
+          });
+        }
       }
+    } catch {
+      console.log(error.message);
     }
   };
 
   // Upload image as blob (binary large object) to firestore
-  async uploadImage(uri) {
+  uploadImage = async (uri) => {
     try {
       const blob = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -118,7 +136,7 @@ export default class CustomActions extends React.Component {
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
   render() {
     return (

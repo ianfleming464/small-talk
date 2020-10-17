@@ -13,6 +13,13 @@ import MapView from "react-native-maps";
 const firebase = require("firebase");
 require("firebase/firestore");
 
+// ES6 Checklist:
+// Template literals? Y, where applicable
+// no var? Y
+// Arrow functions? Y
+// Default function parameters? N
+// ALL async functions with try/catch blocks? Y (1 exception)
+
 export default class Chat extends React.Component {
   constructor() {
     super();
@@ -105,7 +112,6 @@ export default class Chat extends React.Component {
   // LIFE CYCLE METHODS
 
   componentDidMount() {
-    // this.getMessages();
     // check connection status and log info (from NetInfo docs)
     NetInfo.fetch().then((state) => {
       console.log("Connection type : ", state.type);
@@ -133,7 +139,7 @@ export default class Chat extends React.Component {
               name: this.props.navigation.state.params.name,
               avatar: "",
             },
-            loggedInText: "Wilkommen!",
+            loggedInText: `Wilkommen ${this.props.navigation.state.params.name}`,
           });
           // create a reference to the active user's documents (messages)
           this.referenceMessageUser = firebase.firestore().collection("messages");
