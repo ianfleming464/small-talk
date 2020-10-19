@@ -109,6 +109,17 @@ export default class Chat extends React.Component {
     );
   }
 
+  // setting up default user values (to show default function parameters)
+  setUser = (_id, name = "Guest", avatar = "https://placeimg.com/140/140/any") => {
+    this.setState({
+      user: {
+        _id: _id,
+        name: name,
+        avatar: avatar,
+      },
+    });
+  };
+
   // LIFE CYCLE METHODS
 
   componentDidMount() {
@@ -130,17 +141,20 @@ export default class Chat extends React.Component {
               console.log(`Unable to sign in: ${error.message}`);
             }
           }
+          if (!this.props.navigation.state.params.name) {
+            this.setUser(user.uid);
+            this.setState({
+              uid: user.uid,
+              loggedInText: "Willkommen",
+            });
+          } else {
+            this.setUser(user.uid, this.props.navigation.state.params.name, user.avatar);
+            this.setState({
+              uid: user.uid,
+              loggedInText: `Willkommen ${this.props.navigation.state.params.name}`,
+            });
+          }
 
-          //update user state with currently active user data
-          this.setState({
-            uid: user.uid,
-            user: {
-              _id: user.uid,
-              name: this.props.navigation.state.params.name,
-              avatar: "",
-            },
-            loggedInText: `Wilkommen ${this.props.navigation.state.params.name}`,
-          });
           // create a reference to the active user's documents (messages)
           this.referenceMessageUser = firebase.firestore().collection("messages");
 
