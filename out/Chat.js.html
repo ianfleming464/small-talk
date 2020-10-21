@@ -1,4 +1,32 @@
-import React, { Component } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Chat.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Chat.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from "react";
 import { StyleSheet, View, Text, Platform, KeyboardAvoidingView } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -232,11 +260,11 @@ export default class Chat extends React.Component {
   }
 
   componentWillUnmount() {
-    // using the && operator to eliminate 'not a function' error
+    // using the &amp;&amp; operator to eliminate 'not a function' error
     // stop listening to authentication
-    this.authUnsubscribe && this.authUnsubscribe();
+    this.authUnsubscribe &amp;&amp; this.authUnsubscribe();
     // stop listening for changes
-    this.unsubscribeMessageUser && this.unsubscribeMessageUser();
+    this.unsubscribeMessageUser &amp;&amp; this.unsubscribeMessageUser();
   }
 
   // add user's name to navbar
@@ -310,7 +338,7 @@ export default class Chat extends React.Component {
 
   renderBubble(props) {
     return (
-      <Bubble
+      &lt;Bubble
         {...props}
         wrapperStyle={{
           right: {
@@ -332,7 +360,7 @@ export default class Chat extends React.Component {
   renderInputToolbar(props) {
     if (this.state.isConnected === false) {
     } else {
-      return <InputToolbar {...props} />;
+      return &lt;InputToolbar {...props} />;
     }
   }
 
@@ -343,7 +371,7 @@ export default class Chat extends React.Component {
    */
 
   renderCustomActions = (props) => {
-    return <CustomActions {...props} />;
+    return &lt;CustomActions {...props} />;
   };
 
   /**
@@ -356,7 +384,7 @@ export default class Chat extends React.Component {
     const { currentMessage } = props;
     if (currentMessage.location) {
       return (
-        <MapView
+        &lt;MapView
           style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
           region={{
             latitude: currentMessage.location.latitude,
@@ -375,10 +403,10 @@ export default class Chat extends React.Component {
      * uses the name and background colour as selected on start screen
      */
     return (
-      <View style={{ flex: 1, backgroundColor: this.props.navigation.state.params.color }}>
-        <Text style={styles.userHi}>{this.state.loggedInText}</Text>
+      &lt;View style={{ flex: 1, backgroundColor: this.props.navigation.state.params.color }}>
+        &lt;Text style={styles.userHi}>{this.state.loggedInText}&lt;/Text>
 
-        <GiftedChat
+        &lt;GiftedChat
           renderBubble={this.renderBubble}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderActions={this.renderCustomActions}
@@ -387,8 +415,8 @@ export default class Chat extends React.Component {
           onSend={(messages) => this.onSend(messages)}
           user={this.state.user}
         />
-        {Platform.OS === "android" ? <KeyboardAvoidingView behavior="height" /> : null}
-      </View>
+        {Platform.OS === "android" ? &lt;KeyboardAvoidingView behavior="height" /> : null}
+      &lt;/View>
     );
   }
 }
@@ -411,3 +439,26 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
 });
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Chat.html">Chat</a></li><li><a href="CustomActions.html">CustomActions</a></li><li><a href="Start.html">Start</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addMessages">addMessages</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#deleteMessages">deleteMessages</a></li><li><a href="global.html#getLocation">getLocation</a></li><li><a href="global.html#getMessages">getMessages</a></li><li><a href="global.html#onCollectionUpdate">onCollectionUpdate</a></li><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#renderBubble">renderBubble</a></li><li><a href="global.html#renderCustomActions">renderCustomActions</a></li><li><a href="global.html#renderCustomView">renderCustomView</a></li><li><a href="global.html#renderInputToolbar">renderInputToolbar</a></li><li><a href="global.html#saveMessages">saveMessages</a></li><li><a href="global.html#setUser">setUser</a></li><li><a href="global.html#takePhoto">takePhoto</a></li><li><a href="global.html#uploadImage">uploadImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Oct 21 2020 22:24:16 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
