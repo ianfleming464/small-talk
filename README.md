@@ -100,3 +100,9 @@ this.referenceMessages = firebase.firestore().collection('chat');`
 ```
 
 And there you have it, pretty much. Time to make awkward small talk :)
+
+# Link to Kanban board
+
+https://ora.pm/project/254570/kanban
+
+
