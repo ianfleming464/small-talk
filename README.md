@@ -54,8 +54,9 @@ You can also take pictures and send them via the app, select images from your ga
 
 # Database information
 
-This project uses [Google Firebase/Firestore](https://firebase.google.com/) for data storage.<br>
-Regarding the setup, the [Firebase documentation] is thorough and straightforward. (https://firebase.google.com/docs/web/setup)
+This project uses Google's Firebase/Firestore (https://firebase.google.com/) for data storage.
+
+Regarding the setup, the Firebase documentation is thorough and straightforward. (https://firebase.google.com/docs/web/setup)
 
 ## Set up Firestore for your React Native project
 
