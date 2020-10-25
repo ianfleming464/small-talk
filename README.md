@@ -63,6 +63,8 @@ Regarding the setup, the Firebase documentation is thorough and straightforward.
 1. Sign in, then click on "Go to console" link
 
 2. Choose to start in test mode, so we don't need to create any security rules. Note: once you start receiving the warning emails regarding the test rules, 
+it's time to either write some OR alternatively follow the link in the email and change the date for later in the year, to essentially extend the 'test' development period. This is not recommended for any commercial app purposes, or if there is any posible sensitive information or data in the app. But, for building an app as an exercise,
+it's quite alright ;)
 
 3. Install Firestore via Firebase in your project: `npm install firebase` or `yarn add firebase`
 
