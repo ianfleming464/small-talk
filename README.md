@@ -2,7 +2,7 @@
 
 A chat app built with React Native compatible with both Android and IOS devices. The app sends and receives messages, and also stores them locally, to enable limited offline usability.
 
-You can also take pictures and send them via the app, select images from your gallery to end, or share location information. The app interface is build with Gifted-Chat Library, uses Google Firebase Firestore as the database, and documentation is generated using JSDoc. Finally, the Expo framework is used for building and testing the app.
+You can also take pictures and send them via the app, select images from your gallery to send, or share location information. The app interface is build with Gifted-Chat Library, uses Google Firebase Firestore as the database, and documentation is generated using JSDoc. Finally, the Expo framework is used for building and testing the app.
 
 ## Dependencies :
 
